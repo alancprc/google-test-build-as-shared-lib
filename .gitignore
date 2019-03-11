@@ -1,2 +1,3 @@
-Libraries/build-GTest/build/
-libGTest.un.so
+*.o
+*.so
+temp-build-dir/

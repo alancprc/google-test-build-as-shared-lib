@@ -19,8 +19,19 @@ GTEST_DIR = ./googletest/googletest
 # Where to find user code.
 USER_DIR = ${GTEST_DIR}/samples
 
+# uno file of unison application
+UNOFILE = ./build-gtest-unison-library.uno
+
 # Kernel version
 KERNELVERSION = $(shell uname -r | cut -f1 -d-)
+
+# unison lib
+ifeq ("${KERNELVERSION}", "3.10.0")
+	UNISON_LIB = x86_64_linux_3.10.0/libGTest.un.so
+else
+	UNISON_LIB = x86_64_linux_2.6.32/libGTest.un.so
+endif
+
 # Flags passed to the preprocessor.
 # Set Google Test's header directory as a system directory, such that
 # the compiler doesn't generate warnings in Google Test headers.
@@ -55,10 +66,11 @@ GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
 
 # House-keeping build targets.
 
-all : libgtest.so libgtest_main.so sample1_unittest run_sample
+all : libgtest.so libgtest_main.so sample1_unittest $(UNISON_LIB) run_sample
 
 clean :
-	rm -f sample1_unittest *.so  *.o
+	rm -f sample1_unittest *.so  *.o $(UNISON_LIB)
+	rm -rf ./temp-build-dir
 
 # Builds gtest.a and gtest_main.a.
 
@@ -97,3 +109,6 @@ sample1_unittest : sample1.o sample1_unittest.o libgtest_main.so
 
 run_sample : 
 	LD_LIBRARY_PATH=. ./sample1_unittest
+
+$(UNISON_LIB) : $(GTEST_SRCS_) $(UNOFILE)
+	MethodCompiler -force -f build-gtest-unison-library.uno

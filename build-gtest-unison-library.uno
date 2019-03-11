@@ -1,8 +1,8 @@
 Unison:SyntaxRevision1709.1;
 
 __ApplicationLibrary GTest {
-   __LibraryPath = "./Libraries/GTest";
-   __BuildPath = "./Libraries/build-GTest";
+   __LibraryPath = "./";
+   __BuildPath = "./temp-build-dir/";
    __LibraryType = __Debug;
    __Source = "./googletest/googletest/src/gtest-all.cc";
    __IncludePath = "./googletest/googletest";
