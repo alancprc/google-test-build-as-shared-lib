@@ -15,27 +15,30 @@
 # Points to the root of Google Test, relative to where this file is.
 # Remember to tweak this if you move this file.
 GTEST_DIR = ./googletest/googletest
+GMOCK_DIR = ./googletest/googlemock
 
 # Where to find user code.
 USER_DIR = ${GTEST_DIR}/samples
 
 # uno file of unison application
-UNOFILE = ./build-gtest-unison-library.uno
-
+GTEST_UNOFILE = ./build-gtest-unison-library.uno
+GMOCK_UNOFILE = ./build-gmock-unison-library.uno
 # Kernel version
 KERNELVERSION = $(shell uname -r | cut -f1 -d-)
 
 # unison lib
 ifeq ("${KERNELVERSION}", "3.10.0")
-	UNISON_LIB = x86_64_linux_3.10.0/libGTest.un.so
+	UNISON_GTEST_LIB = x86_64_linux_3.10.0/libGTest.un.so
+	UNISON_GMOCK_LIB = x86_64_linux_3.10.0/libGMock.un.so
 else
-	UNISON_LIB = x86_64_linux_2.6.32/libGTest.un.so
+	UNISON_GTEST_LIB = x86_64_linux_2.6.32/libGTest.un.so
+	UNISON_GMOCK_LIB = x86_64_linux_2.6.32/libGMock.un.so
 endif
 
 # Flags passed to the preprocessor.
 # Set Google Test's header directory as a system directory, such that
 # the compiler doesn't generate warnings in Google Test headers.
-CPPFLAGS += -isystem $(GTEST_DIR)/include
+CPPFLAGS += -isystem $(GTEST_DIR)/include -isystem $(GMOCK_DIR)/include
 
 # Flags passed to the C++ compiler.
 ifeq ("${KERNELVERSION}", "3.10.0")
@@ -66,10 +69,11 @@ GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
 
 # House-keeping build targets.
 
-all : libgtest.so libgtest_main.so sample1_unittest $(UNISON_LIB) run_sample
+all : libgtest.so libgtest_main.so libgmock.so libgmock_main.so \
+	sample1_unittest $(UNISON_GTEST_LIB) $(UNISON_GMOCK_LIB) run_sample
 
 clean :
-	rm -f sample1_unittest *.so  *.o $(UNISON_LIB)
+	rm -f sample1_unittest *.so  *.o $(UNISON_GTEST_LIB) $(UNISON_GMOCK_LIB)
 	rm -rf ./temp-build-dir
 
 # Builds gtest.a and gtest_main.a.
@@ -77,6 +81,7 @@ clean :
 # Usually you shouldn't tweak such internal variables, indicated by a
 # trailing _.
 GTEST_SRCS_ = $(GTEST_DIR)/src/*.cc $(GTEST_DIR)/src/*.h $(GTEST_HEADERS)
+GMOCK_SRCS_ = $(GMOCK_DIR)/src/*.cc $(GMOCK_DIR)/src/*.h $(GMOCK_HEADERS)
 
 # For simplicity and to avoid depending on Google Test's
 # implementation details, the dependencies specified below are
@@ -90,10 +95,24 @@ gtest_main.o : $(GTEST_SRCS_)
 	$(CXX) $(CPPFLAGS) -I$(GTEST_DIR) $(CXXFLAGS) $(GTEST_CXXFLAGS) \
 		-c $(GTEST_DIR)/src/gtest_main.cc
 
+gmock-all.o : $(GTEST_SRCS_)
+	$(CXX) $(CPPFLAGS) -I$(GTEST_DIR) -I$(GMOCK_DIR) $(CXXFLAGS) \
+		$(GTEST_CXXFLAGS) -c $(GMOCK_DIR)/src/gmock-all.cc
+
+gmock_main.o : $(GTEST_SRCS_)
+	$(CXX) $(CPPFLAGS) -I$(GTEST_DIR) -I$(GMOCK_DIR) $(CXXFLAGS) \
+		$(GTEST_CXXFLAGS) -c $(GMOCK_DIR)/src/gmock_main.cc
+
 libgtest.so : gtest-all.o
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
 libgtest_main.so : gtest-all.o gtest_main.o
+	$(CXX) -o $@ $^ $(LDFLAGS)
+
+libgmock.so : gmock-all.o gtest-all.o
+	$(CXX) -o $@ $^ $(LDFLAGS)
+
+libgmock_main.so : gmock-all.o gmock_main.o gtest-all.o
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
 sample1.o : $(USER_DIR)/sample1.cc $(USER_DIR)/sample1.h $(GTEST_HEADERS)
@@ -104,11 +123,14 @@ sample1_unittest.o : $(USER_DIR)/sample1_unittest.cc \
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(USER_CXXfLAGS) \
 		-c $(USER_DIR)/sample1_unittest.cc
 
-sample1_unittest : sample1.o sample1_unittest.o libgtest_main.so
+sample1_unittest : sample1.o sample1_unittest.o libgmock_main.so
 	$(CXX) $(CPPFLAGS) $(USER_LDFLAGS) $^ -o $@
 
 run_sample : 
 	LD_LIBRARY_PATH=. ./sample1_unittest
 
-$(UNISON_LIB) : $(GTEST_SRCS_) $(UNOFILE)
-	MethodCompiler -force -f build-gtest-unison-library.uno
+$(UNISON_GTEST_LIB) : $(GTEST_SRCS_) $(GTEST_UNOFILE)
+	MethodCompiler -force -f $(GTEST_UNOFILE)
+
+$(UNISON_GMOCK_LIB) : $(GTEST_SRCS_) $(GMOCK_UNOFILE)
+	MethodCompiler -force -f $(GMOCK_UNOFILE)
