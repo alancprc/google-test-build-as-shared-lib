@@ -106,13 +106,13 @@ gmock_main.o : $(GTEST_SRCS_)
 libgtest.so : gtest-all.o
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
-libgtest_main.so : gtest-all.o gtest_main.o
+libgtest_main.so : gtest_main.o
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
-libgmock.so : gmock-all.o gtest-all.o
+libgmock.so : gmock-all.o
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
-libgmock_main.so : gmock-all.o gmock_main.o gtest-all.o
+libgmock_main.so : gmock_main.o
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
 sample1.o : $(USER_DIR)/sample1.cc $(USER_DIR)/sample1.h $(GTEST_HEADERS)
@@ -123,8 +123,8 @@ sample1_unittest.o : $(USER_DIR)/sample1_unittest.cc \
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(USER_CXXfLAGS) \
 		-c $(USER_DIR)/sample1_unittest.cc
 
-sample1_unittest : sample1.o sample1_unittest.o libgmock_main.so
-	$(CXX) $(CPPFLAGS) $(USER_LDFLAGS) $^ -o $@
+sample1_unittest : sample1.o sample1_unittest.o 
+	$(CXX) $(CPPFLAGS) $(USER_LDFLAGS) $^ -o $@ -L. -lgmock_main -lgmock -lgtest
 
 run_sample : 
 	LD_LIBRARY_PATH=. ./sample1_unittest
