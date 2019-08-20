@@ -130,7 +130,7 @@ run_sample :
 	LD_LIBRARY_PATH=. ./sample1_unittest
 
 $(UNISON_GTEST_LIB) : $(GTEST_SRCS_) $(GTEST_UNOFILE)
-	MethodCompiler -force -f $(GTEST_UNOFILE)
+	MethodCompiler -f $(GTEST_UNOFILE)
 
 $(UNISON_GMOCK_LIB) : $(GTEST_SRCS_) $(GMOCK_UNOFILE)
-	MethodCompiler -force -f $(GMOCK_UNOFILE)
+	MethodCompiler -f $(GMOCK_UNOFILE)
