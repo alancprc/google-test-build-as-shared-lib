@@ -107,13 +107,13 @@ libgtest.so : gtest-all.o
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
 libgtest_main.so : gtest_main.o
-	$(CXX) -o $@ $^ $(LDFLAGS)
+	$(CXX) -o $@ $^ $(LDFLAGS) -L. -lgtest
 
 libgmock.so : gmock-all.o
-	$(CXX) -o $@ $^ $(LDFLAGS)
+	$(CXX) -o $@ $^ $(LDFLAGS) -L. -lgtest
 
 libgmock_main.so : gmock_main.o
-	$(CXX) -o $@ $^ $(LDFLAGS)
+	$(CXX) -o $@ $^ $(LDFLAGS) -L. -lgtest -lgmock
 
 sample1.o : $(USER_DIR)/sample1.cc $(USER_DIR)/sample1.h $(GTEST_HEADERS)
 	$(CXX) $(CPPFLAGS) $(CXXFLAGS) $(USER_CXXfLAGS) -c $(USER_DIR)/sample1.cc
