@@ -46,6 +46,9 @@ ifeq ("${KERNELVERSION}", "3.10.0")
 else
 	CXXFLAGS += -g -Wall -Wextra -pthread
 endif
+
+CXXFLAGS += -fno-gnu-unique
+
 BUILD_BITS := -m64
 COMPILE_GTEST_AS_LIB = -DGTEST_CREATE_SHARED_LIBRARY=1
 GTEST_CXXFLAGS += $(BUILD_BITS) -fPIC -Wwrite-strings -fnon-call-exceptions \
