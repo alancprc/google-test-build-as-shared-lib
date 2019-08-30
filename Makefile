@@ -1,6 +1,3 @@
-# A sample Makefile for building Google Test and using it in user
-# tests.  Please tweak it to suit your environment and project.  You
-# may want to move it to your project's root directory.
 #
 # SYNOPSIS:
 #
@@ -35,12 +32,13 @@ else
 	CXXFLAGS += -g -Wall -Wextra -pthread
 endif
 
-CXXFLAGS += -fno-gnu-unique
-
 BUILD_BITS := -m64
 COMPILE_GTEST_AS_LIB = -DGTEST_CREATE_SHARED_LIBRARY=1
 GTEST_CXXFLAGS += $(BUILD_BITS) -fPIC -Wwrite-strings -fnon-call-exceptions \
 				  -fcheck-new -Werror -Wreturn-type $(COMPILE_GTEST_AS_LIB)
+
+# No UNIQUE symbol in order to reload properly.
+GTEST_CXXFLAGS += -fno-gnu-unique
 
 # Flags passed to the Linker.
 # Flags to link gtest lib
@@ -59,14 +57,11 @@ GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
                 $(GTEST_DIR)/include/gtest/internal/*.h
 
 # House-keeping build targets.
-
 all : libgtest.so libgtest_main.so libgmock.so libgmock_main.so \
 	sample1_unittest run_sample
 
 clean :
 	rm -f sample1_unittest *.so  *.o
-
-# Builds gtest.a and gtest_main.a.
 
 # Usually you shouldn't tweak such internal variables, indicated by a
 # trailing _.
