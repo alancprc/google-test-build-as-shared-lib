@@ -47,9 +47,7 @@ LDFLAGS += $(BUILD_BITS) -shared -Wl,-rpath='$$ORIGIN' -pthread
 # Flags to compile and link sample1_unitest
 USE_GTEST_AS_LIB = -DGTEST_LINKED_SHARED_LIBRARY=1
 USER_CXXfLAGS += $(BUILD_BITS) $(USE_GTEST_AS_LIB)
-USER_LOCALLIB += .
-USER_LDFLAGS += $(BUILD_BITS) -Wl,-rpath='$$ORIGIN' -pthread \
-				-isystem $(LOCALLIB) -I $(LOCALLIB)
+USER_LDFLAGS += $(BUILD_BITS) -Wl,-rpath='$$ORIGIN' -pthread
 
 # All Google Test headers.  Usually you shouldn't change this
 # definition.
