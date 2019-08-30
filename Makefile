@@ -20,20 +20,8 @@ GMOCK_DIR = ./googletest/googlemock
 # Where to find user code.
 USER_DIR = ${GTEST_DIR}/samples
 
-# uno file of unison application
-GTEST_UNOFILE = ./build-gtest-unison-library.uno
-GMOCK_UNOFILE = ./build-gmock-unison-library.uno
 # Kernel version
 KERNELVERSION = $(shell uname -r | cut -f1 -d-)
-
-# unison lib
-ifeq ("${KERNELVERSION}", "3.10.0")
-	UNISON_GTEST_LIB = x86_64_linux_3.10.0/libGTest.un.so
-	UNISON_GMOCK_LIB = x86_64_linux_3.10.0/libGMock.un.so
-else
-	UNISON_GTEST_LIB = x86_64_linux_2.6.32/libGTest.un.so
-	UNISON_GMOCK_LIB = x86_64_linux_2.6.32/libGMock.un.so
-endif
 
 # Flags passed to the preprocessor.
 # Set Google Test's header directory as a system directory, such that
@@ -73,11 +61,10 @@ GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
 # House-keeping build targets.
 
 all : libgtest.so libgtest_main.so libgmock.so libgmock_main.so \
-	sample1_unittest $(UNISON_GTEST_LIB) $(UNISON_GMOCK_LIB) run_sample
+	sample1_unittest run_sample
 
 clean :
-	rm -f sample1_unittest *.so  *.o $(UNISON_GTEST_LIB) $(UNISON_GMOCK_LIB)
-	rm -rf ./temp-build-dir
+	rm -f sample1_unittest *.so  *.o
 
 # Builds gtest.a and gtest_main.a.
 
@@ -131,9 +118,3 @@ sample1_unittest : sample1.o sample1_unittest.o
 
 run_sample : 
 	LD_LIBRARY_PATH=. ./sample1_unittest
-
-$(UNISON_GTEST_LIB) : $(GTEST_SRCS_) $(GTEST_UNOFILE)
-	MethodCompiler -f $(GTEST_UNOFILE)
-
-$(UNISON_GMOCK_LIB) : $(GTEST_SRCS_) $(GMOCK_UNOFILE)
-	MethodCompiler -f $(GMOCK_UNOFILE)
