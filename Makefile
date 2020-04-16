@@ -38,7 +38,10 @@ GTEST_CXXFLAGS += $(BUILD_BITS) -fPIC -Wwrite-strings -fnon-call-exceptions \
 				  -fcheck-new -Werror -Wreturn-type $(COMPILE_GTEST_AS_LIB)
 
 # No UNIQUE symbol in order to reload properly.
-GTEST_CXXFLAGS += -fno-gnu-unique
+# gcc 4.4 on CentOS 6 doesn't have this option.
+ifeq ("${KERNELVERSION}", "3.10.0")
+	GTEST_CXXFLAGS += -fno-gnu-unique
+endif
 
 # Flags passed to the Linker.
 # Flags to link gtest lib
