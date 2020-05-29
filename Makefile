@@ -67,7 +67,7 @@ clean :
 # Usually you shouldn't tweak such internal variables, indicated by a
 # trailing _.
 GTEST_SRCS_ = $(GTEST_DIR)/src/*.cc $(GTEST_DIR)/src/*.h $(GTEST_HEADERS)
-GMOCK_SRCS_ = $(GMOCK_DIR)/src/*.cc $(GMOCK_DIR)/src/*.h $(GMOCK_HEADERS)
+GMOCK_SRCS_ = $(GMOCK_DIR)/src/*.cc                      $(GMOCK_HEADERS)
 
 # For simplicity and to avoid depending on Google Test's
 # implementation details, the dependencies specified below are
@@ -81,11 +81,11 @@ gtest_main.o : $(GTEST_SRCS_)
 	$(CXX) $(CPPFLAGS) -I$(GTEST_DIR) $(CXXFLAGS) $(GTEST_CXXFLAGS) \
 		-c $(GTEST_DIR)/src/gtest_main.cc
 
-gmock-all.o : $(GTEST_SRCS_)
+gmock-all.o : $(GMOCK_SRCS_)
 	$(CXX) $(CPPFLAGS) -I$(GTEST_DIR) -I$(GMOCK_DIR) $(CXXFLAGS) \
 		$(GTEST_CXXFLAGS) -c $(GMOCK_DIR)/src/gmock-all.cc
 
-gmock_main.o : $(GTEST_SRCS_)
+gmock_main.o : $(GMOCK_SRCS_)
 	$(CXX) $(CPPFLAGS) -I$(GTEST_DIR) -I$(GMOCK_DIR) $(CXXFLAGS) \
 		$(GTEST_CXXFLAGS) -c $(GMOCK_DIR)/src/gmock_main.cc
 
