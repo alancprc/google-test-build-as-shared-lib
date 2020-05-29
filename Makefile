@@ -29,9 +29,10 @@ CPPFLAGS += -isystem $(GTEST_DIR)/include -isystem $(GMOCK_DIR)/include
 ifeq ("${KERNELVERSION}", "3.10.0")
 	CXXFLAGS += -g -Wall -Wextra -pthread -std=c++11
 else
-	CXXFLAGS += -g -Wall -Wextra -pthread
+	CXXFLAGS += -g -Wall -Wextra -pthread -std=c++0x
 endif
 
+# need -m32 for Unison 4 on CentOS 6
 BUILD_BITS := -m64
 COMPILE_GTEST_AS_LIB = -DGTEST_CREATE_SHARED_LIBRARY=1
 GTEST_CXXFLAGS += $(BUILD_BITS) -fPIC -Wwrite-strings -fnon-call-exceptions \
@@ -41,6 +42,8 @@ GTEST_CXXFLAGS += $(BUILD_BITS) -fPIC -Wwrite-strings -fnon-call-exceptions \
 # gcc 4.4 on CentOS 6 doesn't have this option.
 ifeq ("${KERNELVERSION}", "3.10.0")
 	GTEST_CXXFLAGS += -fno-gnu-unique
+else
+	CXXFLAGS += -DGTEST_LANG_CXX11=0
 endif
 
 # Flags passed to the Linker.
