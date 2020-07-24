@@ -26,24 +26,32 @@ KERNELVERSION = $(shell uname -r | cut -f1 -d-)
 CPPFLAGS += -isystem $(GTEST_DIR)/include -isystem $(GMOCK_DIR)/include
 
 # Flags passed to the C++ compiler.
-ifeq ("${KERNELVERSION}", "3.10.0")
-	CXXFLAGS += -g -Wall -Wextra -pthread -std=c++11
-else
-	CXXFLAGS += -g -Wall -Wextra -pthread -std=c++0x
-endif
+CXXFLAGS += -g -Wall -Wextra -pthread
 
-# need -m32 for Unison 4 on CentOS 6
 BUILD_BITS := -m64
 COMPILE_GTEST_AS_LIB = -DGTEST_CREATE_SHARED_LIBRARY=1
 GTEST_CXXFLAGS += $(BUILD_BITS) -fPIC -Wwrite-strings -fnon-call-exceptions \
 				  -fcheck-new -Werror -Wreturn-type $(COMPILE_GTEST_AS_LIB)
 
+# U4
+ifneq ($(shell readlink /opt/ltx/ltx_os | grep U4),)
+	BUILD_BITS := -m32
+	CXXFLAGS += -std=c++0x -DGTEST_LANG_CXX11=0
+
+	# CentOS 7 with compat-gcc-44-c++ installed
+	ifneq ($(wildcard /usr/bin/g++44),)
+		CXX = /usr/bin/g++44
+	endif
+endif
+
+ifneq ($(shell man $(CXX) | grep c++11), )
+	CXXFLAGS += -std=c++11
+endif
+
 # No UNIQUE symbol in order to reload properly.
-# gcc 4.4 on CentOS 6 doesn't have this option.
-ifeq ("${KERNELVERSION}", "3.10.0")
+UNIQUE = $(shell man $(CXX) | grep no-gnu-unique)
+ifneq ("$(UNIQUE)", "")
 	GTEST_CXXFLAGS += -fno-gnu-unique
-else
-	CXXFLAGS += -DGTEST_LANG_CXX11=0
 endif
 
 # Flags passed to the Linker.
